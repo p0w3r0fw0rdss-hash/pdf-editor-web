@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Isabel PDF Suite — Editor y herramientas PDF gratis</title>
+  <title>PDF REAL FREE EDITOR — Editor y herramientas PDF gratis</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -11,7 +11,7 @@
   <header class="top-bar">
     <div class="logo">
       <span class="logo-icon">📄</span>
-      <h1>Isabel <span>PDF Suite</span></h1>
+      <h1>PDF REAL FREE EDITOR</h1>
     </div>
     <nav>
       <button onclick="showSection('editor')" class="nav-btn active">Editor</button>
@@ -50,11 +50,13 @@
           <input type="color" id="toolColor" value="#e63946" oninput="updateColor(this.value)">
         </div>
         <button onclick="clearAnnotations()">🗑️ Limpiar</button>
+        <button onclick="toggleGrid()">🔲 Cuadrícula</button>
         <button onclick="downloadPDF()">💾 Descargar</button>
       </div>
 
       <div id="editorArea" class="editor-area" style="display:none;">
         <div class="pdf-viewer">
+          <div style="font-size:0.8rem;color:#777;margin-bottom:0.25rem;font-weight:600;">↘ Haz clic EXACTO donde quieras editar. El indicador rojo muestra la posición precisa.</div>
           <canvas id="pdfCanvas"></canvas>
         </div>
         <aside class="side-panel">
@@ -75,6 +77,7 @@
             <label>Opacidad:</label>
             <input type="range" id="propOpacity" min="0.1" max="1" step="0.05" value="1" oninput="updateOpacity(this.value)">
           </div>
+          <div class="hint">💡 Haz clic exacto sobre el PDF. Las coordenadas X/Y se actualizan automáticamente con la posición exacta del clic.</div>
         </aside>
       </div>
     </section>
@@ -168,7 +171,7 @@
   </main>
 
   <footer>
-    <p>Isabel PDF Suite — Editor y herramientas gratuitas · Sin registro · 100% en navegador</p>
+    <p>PDF REAL FREE EDITOR — Editor y herramientas gratuitas · Sin registro · 100% en navegador</p>
   </footer>
 
   <script src="app.js"></script>
