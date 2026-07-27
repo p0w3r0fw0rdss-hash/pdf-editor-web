@@ -3,39 +3,174 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PDF Editor Online - Gratis</title>
+  <title>Isabel PDF Suite — Editor y herramientas PDF gratis</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1>📄 PDF Editor Online</h1>
-    <p>Sube, edita y descarga tus PDFs de forma gratuita</p>
+  <header class="top-bar">
+    <div class="logo">
+      <span class="logo-icon">📄</span>
+      <h1>Isabel <span>PDF Suite</span></h1>
+    </div>
+    <nav>
+      <button onclick="showSection('editor')" class="nav-btn active">Editor</button>
+      <button onclick="showSection('merge')" class="nav-btn">Fusionar</button>
+      <button onclick="showSection('split')" class="nav-btn">Dividir</button>
+      <button onclick="showSection('protect')" class="nav-btn">Proteger</button>
+      <button onclick="showSection('rotate')" class="nav-btn">Rotar</button>
+      <button onclick="showSection('watermark')" class="nav-btn">Marca de agua</button>
+    </nav>
   </header>
 
   <main>
-    <section class="upload-section">
-      <label for="pdfFile" class="upload-btn">📁 Subir PDF</label>
-      <input type="file" id="pdfFile" accept=".pdf" />
-      <span id="fileName">Ningún archivo seleccionado</span>
+    <!-- EDITOR -->
+    <section id="editor" class="section active">
+      <div class="hero">
+        <h2>Editor de PDF online</h2>
+        <p>Edita texto, añade formas, firma y anota con precisión milimétrica.</p>
+      </div>
+
+      <div class="upload-card">
+        <label for="pdfFile" class="upload-btn">📂 Subir PDF</label>
+        <input type="file" id="pdfFile" accept=".pdf" />
+        <span id="fileName">Ningún archivo seleccionado</span>
+      </div>
+
+      <div id="toolbar" class="toolbar" style="display:none;">
+        <button onclick="setTool('text')">✏️ Texto</button>
+        <button onclick="setTool('rectangle')">⬜ Rectángulo</button>
+        <button onclick="setTool('circle')">⭕ Círculo</button>
+        <button onclick="setTool('line')">➖ Línea</button>
+        <button onclick="setTool('signature')">✍️ Firma</button>
+        <button onclick="setTool('highlight')">🟡 Resaltar</button>
+        <button onclick="setTool('pageNumber')"># Número página</button>
+        <div class="color-picker">
+          <label>Color:</label>
+          <input type="color" id="toolColor" value="#e63946" oninput="updateColor(this.value)">
+        </div>
+        <button onclick="clearAnnotations()">🗑️ Limpiar</button>
+        <button onclick="downloadPDF()">💾 Descargar</button>
+      </div>
+
+      <div id="editorArea" class="editor-area" style="display:none;">
+        <div class="pdf-viewer">
+          <canvas id="pdfCanvas"></canvas>
+        </div>
+        <aside class="side-panel">
+          <h3>Propiedades</h3>
+          <div class="prop-row">
+            <label>Precisión X:</label>
+            <input type="number" id="propX" step="0.1" value="10">
+          </div>
+          <div class="prop-row">
+            <label>Precisión Y:</label>
+            <input type="number" id="propY" step="0.1" value="20">
+          </div>
+          <div class="prop-row">
+            <label>Fuente (px):</label>
+            <input type="number" id="propFont" step="1" value="14" min="8" max="72">
+          </div>
+          <div class="prop-row">
+            <label>Opacidad:</label>
+            <input type="range" id="propOpacity" min="0.1" max="1" step="0.05" value="1" oninput="updateOpacity(this.value)">
+          </div>
+        </aside>
+      </div>
     </section>
 
-    <section class="toolbar" id="toolbar" style="display:none;">
-      <button onclick="setTool('text')">✏️ Añadir texto</button>
-      <button onclick="setTool('draw')">✍️ Dibujar</button>
-      <button onclick="setTool('highlight')">🟡 Resaltar</button>
-      <button onclick="downloadPDF()">💾 Descargar PDF editado</button>
+    <!-- MERGE -->
+    <section id="merge" class="section">
+      <h2>Fusionar PDFs</h2>
+      <p>Combina varios archivos PDF en uno solo, en el orden que elijas.</p>
+      <div class="upload-card">
+        <label for="mergeFiles" class="upload-btn">📂 Añadir PDFs</label>
+        <input type="file" id="mergeFiles" accept=".pdf" multiple />
+      </div>
+      <div id="mergeList" class="file-list"></div>
+      <button onclick="simulateMerge()" class="action-btn">🔗 Fusionar</button>
     </section>
 
-    <section class="canvas-container" id="canvasContainer" style="display:none;">
-      <canvas id="pdfCanvas"></canvas>
+    <!-- SPLIT -->
+    <section id="split" class="section">
+      <h2>Dividir PDF</h2>
+      <p>Selecciona el rango de páginas que deseas extraer.</p>
+      <div class="upload-card">
+        <label for="splitFile" class="upload-btn">📂 Subir PDF</label>
+        <input type="file" id="splitFile" accept=".pdf" />
+      </div>
+      <div id="splitInfo" style="display:none;">
+        <p>Páginas totales: <strong id="totalPages">0</strong></p>
+        <div class="range-row">
+          <label>Desde:</label>
+          <input type="number" id="splitFrom" value="1" min="1">
+          <label>Hasta:</label>
+          <input type="number" id="splitTo" value="1" min="1">
+        </div>
+        <button onclick="simulateSplit()" class="action-btn">✂️ Dividir</button>
+      </div>
+    </section>
+
+    <!-- PROTECT -->
+    <section id="protect" class="section">
+      <h2>Proteger PDF</h2>
+      <p>Añade una contraseña para restringir el acceso al archivo.</p>
+      <div class="upload-card">
+        <label for="protectFile" class="upload-btn">📂 Subir PDF</label>
+        <input type="file" id="protectFile" accept=".pdf" />
+      </div>
+      <div id="protectForm" style="display:none;" class="protect-form">
+        <label>Contraseña:</label>
+        <input type="password" id="protectPass" placeholder="Ingresa contraseña">
+        <label>Confirmar:</label>
+        <input type="password" id="protectPass2" placeholder="Confirma contraseña">
+        <button onclick="simulateProtect()" class="action-btn">🔒 Proteger</button>
+      </div>
+    </section>
+
+    <!-- ROTATE -->
+    <section id="rotate" class="section">
+      <h2>Rotar páginas</h2>
+      <p>Gira las páginas 90°, 180° o 270°.</p>
+      <div class="upload-card">
+        <label for="rotateFile" class="upload-btn">📂 Subir PDF</label>
+        <input type="file" id="rotateFile" accept=".pdf" />
+      </div>
+      <div id="rotateForm" style="display:none;" class="rotate-form">
+        <label>Ángulo:</label>
+        <select id="rotateAngle">
+          <option value="90">90°</option>
+          <option value="180">180°</option>
+          <option value="270">270°</option>
+        </select>
+        <label>Página:</label>
+        <input type="number" id="rotatePage" value="1" min="1">
+        <button onclick="simulateRotate()" class="action-btn">🔄 Rotar</button>
+      </div>
+    </section>
+
+    <!-- WATERMARK -->
+    <section id="watermark" class="section">
+      <h2>Marca de agua</h2>
+      <p>Añade texto o imagen como marca de agua a todas las páginas.</p>
+      <div class="upload-card">
+        <label for="wmFile" class="upload-btn">📂 Subir PDF</label>
+        <input type="file" id="wmFile" accept=".pdf" />
+      </div>
+      <div id="wmForm" style="display:none;" class="wm-form">
+        <label>Texto marca:</label>
+        <input type="text" id="wmText" value="CONFIDENCIAL">
+        <label>Transparencia:</label>
+        <input type="range" id="wmOpacity" min="0.1" max="1" step="0.05" value="0.3" oninput="updateWmOpacity(this.value)">
+        <button onclick="simulateWatermark()" class="action-btn">💧 Aplicar marca</button>
+      </div>
     </section>
   </main>
 
   <footer>
-    <p>Editor 100% gratuito · Funciona directamente en el navegador</p>
+    <p>Isabel PDF Suite — Editor y herramientas gratuitas · Sin registro · 100% en navegador</p>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
